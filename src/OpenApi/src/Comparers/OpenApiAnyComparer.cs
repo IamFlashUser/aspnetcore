@@ -30,7 +30,7 @@ internal sealed class OpenApiAnyComparer : IEqualityComparer<IOpenApiAny>
             {
                 OpenApiNull _ => y is OpenApiNull,
                 OpenApiArray arrayX => y is OpenApiArray arrayY && arrayX.SequenceEqual(arrayY, Instance),
-                OpenApiObject objectX => y is OpenApiObject objectY && objectX.Keys.Count == objectY.Keys.Count && objectX.Keys.All(key => objectY.ContainsKey(key) && Equals(objectX[key], objectY[key])),
+                OpenApiObject objectX => y is OpenApiObject objectY && objectX.Keys.Count == objectY.Keys.Count && objectX.Keys.All(key => objectY.TryGetValue(key, out var yValue) && Equals(objectX[key], yValue)),
                 OpenApiBinary binaryX => y is OpenApiBinary binaryY && binaryX.Value.SequenceEqual(binaryY.Value),
                 OpenApiInteger integerX => y is OpenApiInteger integerY && integerX.Value == integerY.Value,
                 OpenApiLong longX => y is OpenApiLong longY && longX.Value == longY.Value,
@@ -42,7 +42,6 @@ internal sealed class OpenApiAnyComparer : IEqualityComparer<IOpenApiAny>
                 OpenApiByte byteX => y is OpenApiByte byteY && byteX.Value.SequenceEqual(byteY.Value),
                 OpenApiDate dateX => y is OpenApiDate dateY && dateX.Value == dateY.Value,
                 OpenApiDateTime dateTimeX => y is OpenApiDateTime dateTimeY && dateTimeX.Value == dateTimeY.Value,
-                ScrubbedOpenApiAny scrubbedX => y is ScrubbedOpenApiAny scrubbedY && scrubbedX.Value == scrubbedY.Value,
                 _ => x.Equals(y)
             });
     }
@@ -74,7 +73,6 @@ internal sealed class OpenApiAnyComparer : IEqualityComparer<IOpenApiAny>
             OpenApiPassword password => password.Value,
             OpenApiDate date => date.Value,
             OpenApiDateTime dateTime => dateTime.Value,
-            ScrubbedOpenApiAny scrubbed => scrubbed.Value,
             _ => null
         });
 

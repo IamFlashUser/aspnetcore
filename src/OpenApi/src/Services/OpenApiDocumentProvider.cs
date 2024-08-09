@@ -6,10 +6,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Extensions;
+using Microsoft.OpenApi.Writers;
 using System.Linq;
 
 namespace Microsoft.Extensions.ApiDescriptions;
 
+/// <summary>
+/// Provides an implementation of <see cref="IDocumentProvider"/> to use for build-time generation of OpenAPI documents.
+/// </summary>
+/// <param name="serviceProvider">The <see cref="IServiceProvider"/> to use.</param>
 internal sealed class OpenApiDocumentProvider(IServiceProvider serviceProvider) : IDocumentProvider
 {
     /// <summary>
@@ -40,7 +45,7 @@ internal sealed class OpenApiDocumentProvider(IServiceProvider serviceProvider) 
         // more info.
         var targetDocumentService = serviceProvider.GetRequiredKeyedService<OpenApiDocumentService>(documentName);
         var document = await targetDocumentService.GetOpenApiDocumentAsync();
-        var jsonWriter = new ScrubbingOpenApiJsonWriter(writer);
+        var jsonWriter = new OpenApiJsonWriter(writer);
         document.Serialize(jsonWriter, openApiSpecVersion);
     }
 
